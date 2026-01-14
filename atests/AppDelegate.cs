@@ -35,10 +35,12 @@ public class AppDelegate : UIApplicationDelegate {
 		set;
 	}
 
-	public override bool FinishedLaunching (UIApplication application, NSDictionary launchOptions)
+	public override bool FinishedLaunching (UIApplication application, NSDictionary? launchOptions)
 	{
 		// create a new window instance based on the screen size
+		#pragma warning disable CA1422 // Validate platform compatibility
 		Window = new UIWindow (UIScreen.MainScreen.Bounds);
+		#pragma warning restore CA1422 // Validate platform compatibility
 
 		// create a UIViewController with a single UILabel
 		var vc = new UIViewController ();

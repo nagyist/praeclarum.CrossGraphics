@@ -132,16 +132,20 @@ public class AcceptanceTests
 	    public override string Name => "UIGraphics";
 	    public override (IGraphics, object?) BeginDrawing (int width, int height)
 	    {
+            #pragma warning disable CA1416 // Validate platform compatibility
 		    UIGraphics.BeginImageContextWithOptions(new CGSize (width, height), false, 1);
+            #pragma warning restore CA1416 // Validate platform compatibility
 		    var graphics = new CrossGraphics.CoreGraphics.UIKitGraphics (highQuality: true);
 		    return (graphics, null);
 	    }
 	    public override string SaveDrawing (IGraphics graphics, object context, string dir, string name)
 	    {
+            #pragma warning disable CA1416, CA1422 // Validate platform compatibility
 		    var uiImage = UIGraphics.GetImageFromCurrentImageContext ();
 		    UIGraphics.EndImageContext ();
 		    var fullName = name + ".png";
 		    uiImage.AsPNG ()?.Save (Path.Join (dir, fullName), atomically: true);
+            #pragma warning restore CA1416, CA1422 // Validate platform compatibility
 		    return fullName;
 	    }
     }
@@ -220,9 +224,11 @@ public class AcceptanceTests
 					new Metal.MTLSize { Width = (IntPtr)rc.Texture.Width, Height = (IntPtr)rc.Texture.Height, Depth = (IntPtr)1 }),
 				0);
 				var cgImage = bitmap.ToImage ();
-				var uiImage = new UIImage (cgImage);
-				var data = uiImage.AsPNG ();
+				var uiImage = new UIImage (cgImage ?? throw new InvalidOperationException ("Failed to create CGImage from bitmap"));
+				var data = uiImage.AsPNG () ?? throw new InvalidOperationException ("Failed to create PNG data from UIImage");
+                #pragma warning disable CA1422 // Validate platform compatibility
 				data.Save (Path.Combine (dir, fullName), true);
+                #pragma warning restore CA1422 // Validate platform compatibility
 			}
 			return fullName;
 		}
@@ -265,7 +271,7 @@ public class AcceptanceTests
             foreach (var platform in Platforms) {
                 var (graphics, context) = platform.BeginDrawing(width, height);
                 drawing.Draw(new DrawArgs(graphics, width, height));
-                var filename = platform.SaveDrawing(graphics, context, PendingPath, name + "_" + drawing.Title + "_" + platform.Name);
+                var filename = platform.SaveDrawing(graphics, context ?? throw new InvalidOperationException("Context is null"), PendingPath, name + "_" + drawing.Title + "_" + platform.Name);
                 var irender = filename.EndsWith (".svg") ? "smooth" : "crisp-edges";
                 w.Write($"<td style=\"max-wdith:{width}\"><img src=\"{filename}\" alt=\"{drawing.Title} on {platform.Name}\" width=\"{width}\" height=\"{height}\" image-rendering=\"{irender}\" /></td>");
             }
