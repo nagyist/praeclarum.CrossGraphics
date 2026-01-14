@@ -19,7 +19,6 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<NoWarn>$(NoWarn);XCODE_26_0_PREVIEW</NoWarn>
 
 		<!-- Display name -->
 		<ApplicationTitle>Lols</ApplicationTitle>
