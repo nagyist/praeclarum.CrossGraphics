@@ -80,6 +80,7 @@ namespace CrossGraphics
     public class CanvasContent : INotifyPropertyChanged
     {
         public RectangleF Frame = new RectangleF(0, 0, 320, 480);
+        public float PaddingTop = 0.0f;
 
 		public event EventHandler? NeedsDisplay;
 
